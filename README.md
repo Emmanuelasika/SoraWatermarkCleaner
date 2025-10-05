@@ -4,10 +4,8 @@ This project provides a elegant way to remove the sora watermark in the sora2 ge
 
 
 | Watermark Removed | Original |
-|:-----------------:|:--------:|
+|-------------------|----------|
 | https://github.com/user-attachments/assets/8cdc075e-7d15-4d04-8fa2-53dd287e5f4c | https://github.com/user-attachments/assets/3c850ff1-b8e3-41af-a46f-2c734406e77d |
-
-
 
 
 
