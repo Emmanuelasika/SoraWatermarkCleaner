@@ -1,7 +1,7 @@
 import cv2
 import PIL.Image
 import torch
-from iopaint.schema import InpaintRequest, ModelType
+from sorawm.iopaint.schema import InpaintRequest, ModelType
 from loguru import logger
 
 from .base import DiffusionInpaintModel

@@ -5,19 +5,19 @@ from functools import lru_cache
 from pathlib import Path
 from typing import List, Optional
 
-from iopaint.const import (ANYTEXT_NAME, DEFAULT_MODEL_DIR,
+from sorawm.iopaint.const import (ANYTEXT_NAME, DEFAULT_MODEL_DIR,
                            DIFFUSERS_SD_CLASS_NAME,
                            DIFFUSERS_SD_INPAINT_CLASS_NAME,
                            DIFFUSERS_SDXL_CLASS_NAME,
                            DIFFUSERS_SDXL_INPAINT_CLASS_NAME)
-from iopaint.model.original_sd_configs import get_config_files
-from iopaint.schema import ModelInfo, ModelType
+from sorawm.iopaint.model.original_sd_configs import get_config_files
+from sorawm.iopaint.schema import ModelInfo, ModelType
 from loguru import logger
 
 
 def cli_download_model(model: str):
-    from iopaint.model import models
-    from iopaint.model.utils import handle_from_pretrained_exceptions
+    from sorawm.iopaint.model import models
+    from sorawm.iopaint.model.utils import handle_from_pretrained_exceptions
 
     if model in models and models[model].is_erase_model:
         logger.info(f"Downloading {model}...")
@@ -177,7 +177,7 @@ def scan_single_file_diffusion_models(cache_dir) -> List[ModelInfo]:
 
 def scan_inpaint_models(model_dir: Path) -> List[ModelInfo]:
     res = []
-    from iopaint.model import models
+    from sorawm.iopaint.model import models
 
     # logger.info(f"Scanning inpaint models in {model_dir}")
 

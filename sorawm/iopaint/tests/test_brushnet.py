@@ -1,15 +1,15 @@
 import os
 
-from iopaint.const import SD_BRUSHNET_CHOICES
-from iopaint.tests.utils import assert_equal, check_device, get_config
+from sorawm.iopaint.const import SD_BRUSHNET_CHOICES
+from sorawm.iopaint.tests.utils import assert_equal, check_device, get_config
 
 os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
 from pathlib import Path
 
 import pytest
 import torch
-from iopaint.model_manager import ModelManager
-from iopaint.schema import HDStrategy, PowerPaintTask, SDSampler
+from sorawm.iopaint.model_manager import ModelManager
+from sorawm.iopaint.schema import HDStrategy, PowerPaintTask, SDSampler
 
 current_dir = Path(__file__).parent.absolute().resolve()
 save_dir = current_dir / "result"

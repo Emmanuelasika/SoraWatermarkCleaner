@@ -6,7 +6,7 @@ from functools import partial
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from iopaint.model.anytext.ldm.modules.diffusionmodules.util import (conv_nd,
+from sorawm.iopaint.model.anytext.ldm.modules.diffusionmodules.util import (conv_nd,
                                                                      linear)
 
 

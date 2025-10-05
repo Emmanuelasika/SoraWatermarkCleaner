@@ -8,8 +8,8 @@ import numpy as np
 import nvidia_smi
 import psutil
 import torch
-from iopaint.model_manager import ModelManager
-from iopaint.schema import HDStrategy, InpaintRequest, SDSampler
+from sorawm.iopaint.model_manager import ModelManager
+from sorawm.iopaint.schema import HDStrategy, InpaintRequest, SDSampler
 
 try:
     torch._C._jit_override_can_fuse_on_cpu(False)

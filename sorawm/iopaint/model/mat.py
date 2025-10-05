@@ -7,9 +7,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.utils.checkpoint as checkpoint
-from iopaint.helper import (download_model, get_cache_path_by_url, load_model,
+from sorawm.iopaint.helper import (download_model, get_cache_path_by_url, load_model,
                             norm_img)
-from iopaint.schema import InpaintRequest
+from sorawm.iopaint.schema import InpaintRequest
 
 from .base import InpaintModel
 from .utils import (Conv2dLayer, FullyConnectedLayer, MinibatchStdLayer,

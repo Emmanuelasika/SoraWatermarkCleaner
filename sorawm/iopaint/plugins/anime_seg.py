@@ -3,9 +3,9 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from iopaint.helper import load_model
-from iopaint.plugins.base_plugin import BasePlugin
-from iopaint.schema import RunPluginRequest
+from sorawm.iopaint.helper import load_model
+from sorawm.iopaint.plugins.base_plugin import BasePlugin
+from sorawm.iopaint.schema import RunPluginRequest
 from PIL import Image
 
 

@@ -1,8 +1,8 @@
 import cv2
 import numpy as np
-from iopaint.helper import download_model
-from iopaint.plugins.base_plugin import BasePlugin
-from iopaint.schema import RunPluginRequest
+from sorawm.iopaint.helper import download_model
+from sorawm.iopaint.plugins.base_plugin import BasePlugin
+from sorawm.iopaint.schema import RunPluginRequest
 from loguru import logger
 
 

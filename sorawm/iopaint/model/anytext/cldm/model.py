@@ -1,7 +1,7 @@
 import os
 
 import torch
-from iopaint.model.anytext.ldm.util import instantiate_from_config
+from sorawm.iopaint.model.anytext.ldm.util import instantiate_from_config
 from omegaconf import OmegaConf
 
 

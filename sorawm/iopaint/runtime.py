@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Any, Dict
 
 import packaging.version
-from iopaint.schema import Device
+from sorawm.iopaint.schema import Device
 from loguru import logger
 from rich import print
 

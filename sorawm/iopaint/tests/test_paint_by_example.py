@@ -1,9 +1,9 @@
 import cv2
 import pytest
-from iopaint.helper import encode_pil_to_base64
-from iopaint.model_manager import ModelManager
-from iopaint.schema import HDStrategy
-from iopaint.tests.utils import (check_device, current_dir, get_config,
+from sorawm.iopaint.helper import encode_pil_to_base64
+from sorawm.iopaint.model_manager import ModelManager
+from sorawm.iopaint.schema import HDStrategy
+from sorawm.iopaint.tests.utils import (check_device, current_dir, get_config,
                                  get_data, save_dir)
 from PIL import Image
 

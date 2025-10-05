@@ -1,17 +1,17 @@
 import os
 
-from iopaint.helper import encode_pil_to_base64, gen_frontend_mask
-from iopaint.plugins.anime_seg import AnimeSeg
-from iopaint.schema import (Device, InteractiveSegModel, RemoveBGModel,
+from sorawm.iopaint.helper import encode_pil_to_base64, gen_frontend_mask
+from sorawm.iopaint.plugins.anime_seg import AnimeSeg
+from sorawm.iopaint.schema import (Device, InteractiveSegModel, RemoveBGModel,
                             RunPluginRequest)
-from iopaint.tests.utils import check_device, current_dir, save_dir
+from sorawm.iopaint.tests.utils import check_device, current_dir, save_dir
 from PIL import Image
 
 os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
 
 import cv2
 import pytest
-from iopaint.plugins import (GFPGANPlugin, InteractiveSeg, RealESRGANUpscaler,
+from sorawm.iopaint.plugins import (GFPGANPlugin, InteractiveSeg, RealESRGANUpscaler,
                              RemoveBG, RestoreFormerPlugin)
 
 img_p = current_dir / "bunny.jpeg"

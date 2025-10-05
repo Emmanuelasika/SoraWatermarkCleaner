@@ -11,15 +11,15 @@ import numpy as np
 import torch
 import torch.nn as nn
 from einops import rearrange, repeat
-from iopaint.model.anytext.ldm.models.autoencoder import (AutoencoderKL,
+from sorawm.iopaint.model.anytext.ldm.models.autoencoder import (AutoencoderKL,
                                                           IdentityFirstStage)
-from iopaint.model.anytext.ldm.models.diffusion.ddim import DDIMSampler
-from iopaint.model.anytext.ldm.modules.diffusionmodules.util import (
+from sorawm.iopaint.model.anytext.ldm.models.diffusion.ddim import DDIMSampler
+from sorawm.iopaint.model.anytext.ldm.modules.diffusionmodules.util import (
     extract_into_tensor, make_beta_schedule, noise_like)
-from iopaint.model.anytext.ldm.modules.distributions.distributions import (
+from sorawm.iopaint.model.anytext.ldm.modules.distributions.distributions import (
     DiagonalGaussianDistribution, normal_kl)
-from iopaint.model.anytext.ldm.modules.ema import LitEma
-from iopaint.model.anytext.ldm.util import (count_params, default, exists,
+from sorawm.iopaint.model.anytext.ldm.modules.ema import LitEma
+from sorawm.iopaint.model.anytext.ldm.util import (count_params, default, exists,
                                             instantiate_from_config, isimage,
                                             ismap, log_txt_as_img, mean_flat)
 from omegaconf import ListConfig

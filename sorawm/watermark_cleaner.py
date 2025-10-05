@@ -3,10 +3,10 @@ from pathlib import Path
 import cv2
 import numpy as np
 import torch
-from iopaint.const import DEFAULT_MODEL_DIR
-from iopaint.download import cli_download_model, scan_models
-from iopaint.model_manager import ModelManager
-from iopaint.schema import InpaintRequest
+from sorawm.iopaint.const import DEFAULT_MODEL_DIR
+from sorawm.iopaint.download import cli_download_model, scan_models
+from sorawm.iopaint.model_manager import ModelManager
+from sorawm.iopaint.schema import InpaintRequest
 from loguru import logger
 
 from sorawm.configs import DEFAULT_WATERMARK_REMOVE_MODEL

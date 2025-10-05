@@ -1,7 +1,7 @@
 import io
 import os
 
-from iopaint.helper import pil_to_bytes
+from sorawm.iopaint.helper import pil_to_bytes
 from PIL import Image
 
 TESTS_DIR = os.path.dirname(os.path.abspath(__file__))

@@ -11,7 +11,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 from easydict import EasyDict as edict
-from iopaint.model.anytext.ocr_recog.RecModel import RecModel
+from sorawm.iopaint.model.anytext.ocr_recog.RecModel import RecModel
 
 
 def min_bounding_rect(img):

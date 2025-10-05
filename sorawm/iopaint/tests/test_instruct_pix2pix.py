@@ -2,9 +2,9 @@ from pathlib import Path
 
 import pytest
 import torch
-from iopaint.model_manager import ModelManager
-from iopaint.schema import HDStrategy
-from iopaint.tests.utils import (assert_equal, check_device, current_dir,
+from sorawm.iopaint.model_manager import ModelManager
+from sorawm.iopaint.schema import HDStrategy
+from sorawm.iopaint.tests.utils import (assert_equal, check_device, current_dir,
                                  get_config)
 
 model_name = "timbrooks/instruct-pix2pix"

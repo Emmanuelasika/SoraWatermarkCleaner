@@ -2,8 +2,8 @@ import cv2
 import PIL
 import PIL.Image
 import torch
-from iopaint.helper import decode_base64_to_image
-from iopaint.schema import InpaintRequest
+from sorawm.iopaint.helper import decode_base64_to_image
+from sorawm.iopaint.schema import InpaintRequest
 from loguru import logger
 
 from .base import DiffusionInpaintModel

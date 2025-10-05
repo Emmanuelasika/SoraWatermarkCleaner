@@ -1,6 +1,6 @@
 def test_load_model():
-    from iopaint.model_manager import ModelManager
-    from iopaint.plugins import InteractiveSeg
+    from sorawm.iopaint.model_manager import ModelManager
+    from sorawm.iopaint.plugins import InteractiveSeg
 
     interactive_seg_model = InteractiveSeg("vit_l", "cpu")
 

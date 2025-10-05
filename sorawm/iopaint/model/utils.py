@@ -15,7 +15,7 @@ from diffusers import (DDIMScheduler, DPMSolverMultistepScheduler,
                        KDPM2DiscreteScheduler, LCMScheduler,
                        LMSDiscreteScheduler, PNDMScheduler,
                        UniPCMultistepScheduler)
-from iopaint.schema import SDSampler
+from sorawm.iopaint.schema import SDSampler
 from loguru import logger
 from torch import conv2d, conv_transpose2d
 

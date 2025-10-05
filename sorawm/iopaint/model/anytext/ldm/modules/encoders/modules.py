@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from iopaint.model.anytext.ldm.util import count_params
+from sorawm.iopaint.model.anytext.ldm.util import count_params
 from torch.utils.checkpoint import checkpoint
 from transformers import (AutoProcessor, CLIPTextModel, CLIPTokenizer,
                           CLIPVisionModelWithProjection, T5EncoderModel,

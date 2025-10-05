@@ -7,7 +7,7 @@ Copyright (c) Alibaba, Inc. and its affiliates.
 import os
 from pathlib import Path
 
-from iopaint.model.utils import set_seed
+from sorawm.iopaint.model.utils import set_seed
 from safetensors.torch import load_file
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
@@ -17,9 +17,9 @@ import cv2
 import einops
 import numpy as np
 import torch
-from iopaint.model.anytext.cldm.ddim_hacked import DDIMSampler
-from iopaint.model.anytext.cldm.model import create_model, load_state_dict
-from iopaint.model.anytext.utils import check_channels, draw_glyph, draw_glyph2
+from sorawm.iopaint.model.anytext.cldm.ddim_hacked import DDIMSampler
+from sorawm.iopaint.model.anytext.cldm.model import create_model, load_state_dict
+from sorawm.iopaint.model.anytext.utils import check_channels, draw_glyph, draw_glyph2
 from PIL import ImageFont
 
 BBOX_MAX_NUM = 8

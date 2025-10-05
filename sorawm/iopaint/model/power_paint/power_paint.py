@@ -1,7 +1,7 @@
 import cv2
 import PIL.Image
 import torch
-from iopaint.schema import InpaintRequest
+from sorawm.iopaint.schema import InpaintRequest
 from loguru import logger
 from PIL import Image
 

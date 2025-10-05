@@ -8,7 +8,7 @@ from pathlib import Path
 mimetypes.add_type("application/javascript", ".js")
 mimetypes.add_type("text/css", ".css")
 
-from iopaint.schema import (ApiConfig, Device, InteractiveSegModel,
+from sorawm.iopaint.schema import (ApiConfig, Device, InteractiveSegModel,
                             RealESRGANModel, RemoveBGModel)
 
 os.environ["GRADIO_ANALYTICS_ENABLED"] = "False"
@@ -17,8 +17,8 @@ from datetime import datetime
 from json import JSONDecodeError
 
 import gradio as gr
-from iopaint.const import *
-from iopaint.download import scan_models
+from sorawm.iopaint.const import *
+from sorawm.iopaint.download import scan_models
 from loguru import logger
 
 _config_file: Path = None

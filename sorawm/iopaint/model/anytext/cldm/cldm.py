@@ -8,16 +8,16 @@ import torch as th
 import torch.nn as nn
 from easydict import EasyDict as edict
 from einops import rearrange, repeat
-from iopaint.model.anytext.ldm.models.diffusion.ddim import DDIMSampler
-from iopaint.model.anytext.ldm.models.diffusion.ddpm import LatentDiffusion
-from iopaint.model.anytext.ldm.modules.attention import SpatialTransformer
-from iopaint.model.anytext.ldm.modules.diffusionmodules.openaimodel import (
+from sorawm.iopaint.model.anytext.ldm.models.diffusion.ddim import DDIMSampler
+from sorawm.iopaint.model.anytext.ldm.models.diffusion.ddpm import LatentDiffusion
+from sorawm.iopaint.model.anytext.ldm.modules.attention import SpatialTransformer
+from sorawm.iopaint.model.anytext.ldm.modules.diffusionmodules.openaimodel import (
     AttentionBlock, Downsample, ResBlock, TimestepEmbedSequential, UNetModel)
-from iopaint.model.anytext.ldm.modules.diffusionmodules.util import (
+from sorawm.iopaint.model.anytext.ldm.modules.diffusionmodules.util import (
     conv_nd, linear, timestep_embedding, zero_module)
-from iopaint.model.anytext.ldm.modules.distributions.distributions import \
+from sorawm.iopaint.model.anytext.ldm.modules.distributions.distributions import \
     DiagonalGaussianDistribution
-from iopaint.model.anytext.ldm.util import (exists, instantiate_from_config,
+from sorawm.iopaint.model.anytext.ldm.util import (exists, instantiate_from_config,
                                             log_txt_as_img)
 
 from .recognizer import TextRecognizer, create_predictor

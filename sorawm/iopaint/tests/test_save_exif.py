@@ -3,7 +3,7 @@ import tempfile
 from pathlib import Path
 from typing import List
 
-from iopaint.helper import load_img, pil_to_bytes
+from sorawm.iopaint.helper import load_img, pil_to_bytes
 from PIL import Image
 
 current_dir = Path(__file__).parent.absolute().resolve()

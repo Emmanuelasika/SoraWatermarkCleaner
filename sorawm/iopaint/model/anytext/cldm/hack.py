@@ -1,8 +1,8 @@
 import einops
-import iopaint.model.anytext.ldm.modules.attention
-import iopaint.model.anytext.ldm.modules.encoders.modules
+import sorawm.iopaint.model.anytext.ldm.modules.attention
+import sorawm.iopaint.model.anytext.ldm.modules.encoders.modules
 import torch
-from iopaint.model.anytext.ldm.modules.attention import default
+from sorawm.iopaint.model.anytext.ldm.modules.attention import default
 from transformers import logging
 
 
@@ -13,7 +13,7 @@ def disable_verbosity():
 
 
 def enable_sliced_attention():
-    iopaint.model.anytext.ldm.modules.attention.CrossAttention.forward = (
+    sorawm.iopaint.model.anytext.ldm.modules.attention.CrossAttention.forward = (
         _hacked_sliced_attentin_forward
     )
     print("Enabled sliced_attention.")
@@ -22,10 +22,10 @@ def enable_sliced_attention():
 
 def hack_everything(clip_skip=0):
     disable_verbosity()
-    iopaint.model.anytext.ldm.modules.encoders.modules.FrozenCLIPEmbedder.forward = (
+    sorawm.iopaint.model.anytext.ldm.modules.encoders.modules.FrozenCLIPEmbedder.forward = (
         _hacked_clip_forward
     )
-    iopaint.model.anytext.ldm.modules.encoders.modules.FrozenCLIPEmbedder.clip_skip = (
+    sorawm.iopaint.model.anytext.ldm.modules.encoders.modules.FrozenCLIPEmbedder.clip_skip = (
         clip_skip
     )
     print("Enabled clip hacks.")

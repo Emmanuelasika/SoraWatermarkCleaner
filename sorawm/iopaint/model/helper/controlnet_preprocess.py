@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import PIL
 import torch
-from iopaint.helper import pad_img_to_modulo
+from sorawm.iopaint.helper import pad_img_to_modulo
 from PIL import Image
 
 

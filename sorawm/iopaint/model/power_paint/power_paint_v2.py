@@ -4,8 +4,8 @@ import cv2
 import numpy as np
 import PIL.Image
 import torch
-from iopaint.model.original_sd_configs import get_config_files
-from iopaint.schema import InpaintRequest, ModelType
+from sorawm.iopaint.model.original_sd_configs import get_config_files
+from sorawm.iopaint.schema import InpaintRequest, ModelType
 from loguru import logger
 from transformers import CLIPTextModel, CLIPTokenizer
 

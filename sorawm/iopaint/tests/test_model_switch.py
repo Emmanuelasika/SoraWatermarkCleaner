@@ -1,11 +1,11 @@
 import os
 
-from iopaint.schema import InpaintRequest
+from sorawm.iopaint.schema import InpaintRequest
 
 os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
 
 import torch
-from iopaint.model_manager import ModelManager
+from sorawm.iopaint.model_manager import ModelManager
 
 
 def test_model_switch():

@@ -4,10 +4,10 @@ from typing import Dict, Optional
 
 import cv2
 import numpy as np
-from iopaint.helper import pil_to_bytes
-from iopaint.model.utils import torch_gc
-from iopaint.model_manager import ModelManager
-from iopaint.schema import InpaintRequest
+from sorawm.iopaint.helper import pil_to_bytes
+from sorawm.iopaint.model.utils import torch_gc
+from sorawm.iopaint.model_manager import ModelManager
+from sorawm.iopaint.schema import InpaintRequest
 from loguru import logger
 from PIL import Image
 from rich.console import Console

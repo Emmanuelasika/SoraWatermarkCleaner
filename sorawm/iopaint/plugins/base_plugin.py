@@ -1,5 +1,5 @@
 import numpy as np
-from iopaint.schema import RunPluginRequest
+from sorawm.iopaint.schema import RunPluginRequest
 from loguru import logger
 
 

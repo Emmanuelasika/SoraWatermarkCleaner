@@ -5,9 +5,9 @@ import cv2
 import numpy as np
 import torch
 import torch.nn.functional as F
-from iopaint.helper import (download_model, get_cache_path_by_url,
+from sorawm.iopaint.helper import (download_model, get_cache_path_by_url,
                             load_jit_model)
-from iopaint.schema import InpaintRequest
+from sorawm.iopaint.schema import InpaintRequest
 
 from .base import InpaintModel
 

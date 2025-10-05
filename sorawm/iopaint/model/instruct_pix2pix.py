@@ -1,8 +1,8 @@
 import cv2
 import PIL.Image
 import torch
-from iopaint.const import INSTRUCT_PIX2PIX_NAME
-from iopaint.schema import InpaintRequest
+from sorawm.iopaint.const import INSTRUCT_PIX2PIX_NAME
+from sorawm.iopaint.schema import InpaintRequest
 from loguru import logger
 
 from .base import DiffusionInpaintModel

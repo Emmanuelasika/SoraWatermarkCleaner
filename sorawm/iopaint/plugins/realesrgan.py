@@ -4,9 +4,9 @@ import cv2
 import numpy as np
 import torch
 import torch.nn.functional as F
-from iopaint.helper import download_model
-from iopaint.plugins.base_plugin import BasePlugin
-from iopaint.schema import RealESRGANModel, RunPluginRequest
+from sorawm.iopaint.helper import download_model
+from sorawm.iopaint.plugins.base_plugin import BasePlugin
+from sorawm.iopaint.schema import RealESRGANModel, RunPluginRequest
 from loguru import logger
 from torch import nn
 

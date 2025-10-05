@@ -2,7 +2,7 @@ import copy
 import random
 from typing import Any, List, Union
 
-from iopaint.schema import PowerPaintTask
+from sorawm.iopaint.schema import PowerPaintTask
 from transformers import CLIPTokenizer
 
 

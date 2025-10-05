@@ -5,10 +5,10 @@ from typing import Optional
 
 import typer
 from fastapi import FastAPI
-from iopaint.const import *
-from iopaint.runtime import (check_device, dump_environment_info,
+from sorawm.iopaint.const import *
+from sorawm.iopaint.runtime import (check_device, dump_environment_info,
                              setup_model_dir)
-from iopaint.schema import (Device, InteractiveSegModel, RealESRGANModel,
+from sorawm.iopaint.schema import (Device, InteractiveSegModel, RealESRGANModel,
                             RemoveBGModel)
 from loguru import logger
 from typer import Option
@@ -19,7 +19,7 @@ typer_app = typer.Typer(pretty_exceptions_show_locals=False, add_completion=Fals
 
 @typer_app.command(help="Install all plugins dependencies")
 def install_plugins_packages():
-    from iopaint.installer import install_plugins_package
+    from sorawm.iopaint.installer import install_plugins_package
 
     install_plugins_package()
 
@@ -36,7 +36,7 @@ def download(
         callback=setup_model_dir,
     ),
 ):
-    from iopaint.download import cli_download_model
+    from sorawm.iopaint.download import cli_download_model
 
     cli_download_model(model)
 
@@ -50,7 +50,7 @@ def list_model(
         callback=setup_model_dir,
     ),
 ):
-    from iopaint.download import scan_models
+    from sorawm.iopaint.download import scan_models
 
     scanned_models = scan_models()
     for it in scanned_models:
@@ -83,14 +83,14 @@ def run(
         callback=setup_model_dir,
     ),
 ):
-    from iopaint.download import cli_download_model, scan_models
+    from sorawm.iopaint.download import cli_download_model, scan_models
 
     scanned_models = scan_models()
     if model not in [it.name for it in scanned_models]:
         logger.info(f"{model} not found in {model_dir}, try to downloading")
         cli_download_model(model)
 
-    from iopaint.batch_processing import batch_inpaint
+    from sorawm.iopaint.batch_processing import batch_inpaint
 
     batch_inpaint(model, device, image, mask, output, config, concat)
 
@@ -177,15 +177,15 @@ def start(
         os.environ["TRANSFORMERS_OFFLINE"] = "1"
         os.environ["HF_HUB_OFFLINE"] = "1"
 
-    from iopaint.download import cli_download_model, scan_models
+    from sorawm.iopaint.download import cli_download_model, scan_models
 
     scanned_models = scan_models()
     if model not in [it.name for it in scanned_models]:
         logger.info(f"{model} not found in {model_dir}, try to downloading")
         cli_download_model(model)
 
-    from iopaint.api import Api
-    from iopaint.schema import ApiConfig
+    from sorawm.iopaint.api import Api
+    from sorawm.iopaint.schema import ApiConfig
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
@@ -236,6 +236,6 @@ def start_web_config(
     config_file: Path = Option("config.json"),
 ):
     dump_environment_info()
-    from iopaint.web_config import main
+    from sorawm.iopaint.web_config import main
 
     main(config_file)

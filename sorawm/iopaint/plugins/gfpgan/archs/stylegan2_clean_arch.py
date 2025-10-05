@@ -2,7 +2,7 @@ import math
 import random
 
 import torch
-from iopaint.plugins.basicsr.arch_util import default_init_weights
+from sorawm.iopaint.plugins.basicsr.arch_util import default_init_weights
 from torch import nn
 from torch.nn import functional as F
 
