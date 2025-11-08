@@ -26,13 +26,24 @@ async def process_upload_and_queue(
 async def submit_remove_task(
     background_tasks: BackgroundTasks, video: UploadFile = File(...)
 ):
+    # Check if worker initialization failed
+    if worker.initialization_error:
+        raise HTTPException(
+            status_code=503,
+            detail=f"Service unavailable: Models failed to initialize: {worker.initialization_error}"
+        )
+    
     task_id = await worker.create_task()
     content = await video.read()
     upload_filename = f"{uuid4()}_{video.filename}"
     video_path = worker.upload_dir / upload_filename
     background_tasks.add_task(process_upload_and_queue, task_id, content, video_path)
 
-    return {"task_id": task_id, "message": "Task submitted."}
+    message = "Task submitted."
+    if not worker.is_ready():
+        message += " Models are still loading. Task will be processed when models are ready."
+
+    return {"task_id": task_id, "message": message}
 
 
 @router.get("/get_results")

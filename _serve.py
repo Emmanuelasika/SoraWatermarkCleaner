@@ -34,10 +34,19 @@ except Exception as e:
 
 # Add /ping endpoint for RunPod health checks
 # This endpoint should return 200 OK quickly without heavy operations
+# It responds immediately even if models are still loading
 @app.get("/ping")
 def ping():
     """Health check endpoint for RunPod load balancer."""
-    return {"status": "healthy"}
+    from sorawm.server.worker import worker
+    if worker.is_ready():
+        return {"status": "healthy", "models_ready": True}
+    elif worker.initializing:
+        return {"status": "healthy", "models_ready": False, "models_loading": True}
+    elif worker.initialization_error:
+        return {"status": "degraded", "models_ready": False, "error": worker.initialization_error}
+    else:
+        return {"status": "healthy", "models_ready": False, "models_loading": False}
 
 
 # Add root endpoint for basic connectivity check

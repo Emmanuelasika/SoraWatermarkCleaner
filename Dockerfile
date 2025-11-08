@@ -19,12 +19,15 @@ ENV VIRTUAL_ENV=/app/.venv
 ENV PATH="/app/.venv/bin:${PATH}"
 
 # Model caches — safe default. If you mount a Network Volume, mount it at /models.
-ENV TORCH_HOME=/models \
+# All models (YOLO, LAMA, HuggingFace) will be stored on the network volume
+ENV MODELS_DIR=/models \
+    TORCH_HOME=/models \
     HF_HOME=/models/hf \
     HUGGINGFACE_HUB_CACHE=/models/hf \
     TRANSFORMERS_CACHE=/models/hf \
     XDG_CACHE_HOME=/models/.cache
-RUN mkdir -p /models /models/hf /models/.cache
+# Create directory structure (will use network volume if mounted)
+RUN mkdir -p /models /models/hf /models/.cache /app/resources
 
 # Expose the repo's port
 EXPOSE 5344

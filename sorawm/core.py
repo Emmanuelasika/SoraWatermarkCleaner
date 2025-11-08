@@ -65,10 +65,12 @@ class SoraWM:
         total_frames = input_video_loader.total_frames
 
         temp_output_path = output_video_path.parent / f"temp_{output_video_path.name}"
+        # Use "medium" preset instead of "slow" for better speed/quality balance
+        # "slow" can cause timeouts on longer videos
         output_options = {
             "pix_fmt": "yuv420p",
             "vcodec": "libx264",
-            "preset": "slow",
+            "preset": "medium",  # Changed from "slow" to "medium" for better performance
         }
 
         if input_video_loader.original_bitrate:
@@ -78,6 +80,7 @@ class SoraWM:
         else:
             output_options["crf"] = "18"
 
+        # Start FFmpeg process with stderr capture for better error reporting
         process_out = (
             ffmpeg.input(
                 "pipe:",
@@ -88,8 +91,8 @@ class SoraWM:
             )
             .output(str(temp_output_path), **output_options)
             .overwrite_output()
-            .global_args("-loglevel", "error")
-            .run_async(pipe_stdin=True)
+            .global_args("-loglevel", "warning")  # Changed from "error" to "warning" to see more info
+            .run_async(pipe_stdin=True, pipe_stderr=True)
         )
 
         frame_bboxes = {}
@@ -165,24 +168,72 @@ class SoraWM:
         
         input_video_loader = VideoLoader(input_video_path)
 
-        for idx, frame in enumerate(tqdm(input_video_loader, total=total_frames, desc="Remove watermarks", disable=quiet)):
-            bbox = frame_bboxes[idx]["bbox"]
-            if bbox is not None:
-                x1, y1, x2, y2 = bbox
-                mask = np.zeros((height, width), dtype=np.uint8)
-                mask[y1:y2, x1:x2] = 255
-                cleaned_frame = self.cleaner.clean(frame, mask)
-            else:
-                cleaned_frame = frame
-            process_out.stdin.write(cleaned_frame.tobytes())
+        try:
+            for idx, frame in enumerate(tqdm(input_video_loader, total=total_frames, desc="Remove watermarks", disable=quiet)):
+                # Check if FFmpeg process is still alive
+                if process_out.poll() is not None:
+                    # Process has terminated
+                    return_code = process_out.returncode
+                    stderr_output = process_out.stderr.read().decode('utf-8', errors='ignore') if process_out.stderr else ""
+                    raise RuntimeError(
+                        f"FFmpeg process terminated unexpectedly with return code {return_code}. "
+                        f"Error: {stderr_output}"
+                    )
+                
+                bbox = frame_bboxes[idx]["bbox"]
+                if bbox is not None:
+                    x1, y1, x2, y2 = bbox
+                    mask = np.zeros((height, width), dtype=np.uint8)
+                    mask[y1:y2, x1:x2] = 255
+                    cleaned_frame = self.cleaner.clean(frame, mask)
+                else:
+                    cleaned_frame = frame
+                
+                # Write frame to FFmpeg pipe with error handling
+                try:
+                    process_out.stdin.write(cleaned_frame.tobytes())
+                    process_out.stdin.flush()  # Flush to ensure data is written
+                except BrokenPipeError as e:
+                    # FFmpeg process closed the pipe (crashed or closed)
+                    stderr_output = process_out.stderr.read().decode('utf-8', errors='ignore') if process_out.stderr else ""
+                    raise RuntimeError(
+                        f"FFmpeg pipe broken at frame {idx}/{total_frames}. "
+                        f"This usually means FFmpeg crashed. Error: {stderr_output}"
+                    ) from e
+                except Exception as e:
+                    raise RuntimeError(f"Error writing frame {idx} to FFmpeg: {e}") from e
 
-            # 50% - 95%
-            if progress_callback and idx % 10 == 0:
-                progress = 50 + int((idx / total_frames) * 45)
-                progress_callback(progress)
+                # 50% - 95%
+                if progress_callback and idx % 10 == 0:
+                    progress = 50 + int((idx / total_frames) * 45)
+                    progress_callback(progress)
 
-        process_out.stdin.close()
-        process_out.wait()
+            # Close stdin and wait for FFmpeg to finish
+            process_out.stdin.close()
+            return_code = process_out.wait()
+            
+            if return_code != 0:
+                stderr_output = process_out.stderr.read().decode('utf-8', errors='ignore') if process_out.stderr else ""
+                raise RuntimeError(
+                    f"FFmpeg encoding failed with return code {return_code}. "
+                    f"Error: {stderr_output}"
+                )
+                
+        except Exception as e:
+            # Ensure process is terminated on error
+            try:
+                process_out.stdin.close()
+            except:
+                pass
+            try:
+                process_out.terminate()
+                process_out.wait(timeout=5)
+            except:
+                try:
+                    process_out.kill()
+                except:
+                    pass
+            raise
 
         # 95% - 99%
         if progress_callback:

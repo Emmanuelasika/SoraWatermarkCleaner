@@ -229,3 +229,11 @@ upload_to_huggingface.py
 resources/best.pt
 resources/model_version.json
 .web
+
+# Test scripts
+test_*.py
+test_*.ps1
+test_*.sh
+
+# Video files
+*.mp4
