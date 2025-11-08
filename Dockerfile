@@ -2,17 +2,23 @@
 FROM pytorch/pytorch:2.3.1-cuda12.1-cudnn8-runtime
 
 # System deps (FFmpeg is required by the repo)
+# This layer is cached unless system deps change
 RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg git && \
     rm -rf /var/lib/apt/lists/*
 
-# App
-WORKDIR /app
-COPY . /app
+# Install pip and uv first (cached unless these change)
+RUN pip install -U pip uv
 
-# Install Python deps using uv (repo has pyproject.toml + uv.lock)
-# Fall back to requirements.txt if needed.
-RUN pip install -U pip uv && \
-    (uv sync --frozen || pip install --no-cache-dir -r requirements.txt)
+# App - Copy dependency files first for better caching
+WORKDIR /app
+COPY pyproject.toml uv.lock ./
+
+# Install Python deps (cached unless dependencies change)
+RUN uv sync --frozen
+
+# Copy application code last (changes most frequently)
+# This layer is rebuilt only when code changes, not dependencies
+COPY . /app
 
 # Make sure the container actually runs the uv-created venv
 ENV VIRTUAL_ENV=/app/.venv
