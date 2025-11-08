@@ -70,7 +70,6 @@ class SoraWM:
         output_options = {
             "pix_fmt": "yuv420p",
             "vcodec": "libx264",
-            "preset": "medium",  # Changed from "slow" to "medium" for better performance
         }
 
         if input_video_loader.original_bitrate:
@@ -81,6 +80,7 @@ class SoraWM:
             output_options["crf"] = "18"
 
         # Start FFmpeg process with stderr capture for better error reporting
+        # Use -preset medium for libx264 encoding (passed as global arg, not output option)
         process_out = (
             ffmpeg.input(
                 "pipe:",
@@ -92,6 +92,7 @@ class SoraWM:
             .output(str(temp_output_path), **output_options)
             .overwrite_output()
             .global_args("-loglevel", "warning")  # Changed from "error" to "warning" to see more info
+            .global_args("-preset", "medium")  # libx264 preset: medium for speed/quality balance
             .run_async(pipe_stdin=True, pipe_stderr=True)
         )
 
