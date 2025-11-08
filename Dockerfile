@@ -1,27 +1,22 @@
-# CUDA + PyTorch + Python
 FROM pytorch/pytorch:2.3.1-cuda12.1-cudnn8-runtime
 
-# FFmpeg for video io
 RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg git && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-# build from your fork (RunPod will clone your repo), so just copy everything
 COPY . /app
 
-# use uv (project has uv.lock) to install exact deps
-RUN pip install --no-cache-dir uv && \
-    uv sync --frozen
-ENV VIRTUAL_ENV=/app/.venv
-ENV PATH="/app/.venv/bin:${PATH}"
+# Install deps (uv lock if present, else requirements.txt)
+RUN pip install --no-cache-dir uv && uv sync --frozen || \
+    pip install --no-cache-dir -r requirements.txt
 
-# cache model weights on a mounted volume
+# Always write caches to /models (works even if it's just ephemeral)
 ENV TORCH_HOME=/models \
     HF_HOME=/models/hf \
-    HUGGINGFACE_HUB_CACHE=/models/hf
+    HUGGINGFACE_HUB_CACHE=/models/hf \
+    TRANSFORMERS_CACHE=/models/hf \
+    XDG_CACHE_HOME=/models/.cache
+RUN mkdir -p /models /models/hf /models/.cache
 
-RUN mkdir -p /models
-
-# the repo's FastAPI app starts on port 5344
 EXPOSE 5344
 CMD ["python", "start_server.py"]
