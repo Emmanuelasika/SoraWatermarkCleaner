@@ -80,7 +80,8 @@ class SoraWM:
             output_options["crf"] = "18"
 
         # Start FFmpeg process with stderr capture for better error reporting
-        # Use -preset medium for libx264 encoding (passed as global arg, not output option)
+        # Note: Removed preset option as it causes issues with some FFmpeg versions
+        # FFmpeg will use default libx264 settings which provide good quality/speed balance
         process_out = (
             ffmpeg.input(
                 "pipe:",
@@ -92,7 +93,6 @@ class SoraWM:
             .output(str(temp_output_path), **output_options)
             .overwrite_output()
             .global_args("-loglevel", "warning")  # Changed from "error" to "warning" to see more info
-            .global_args("-preset", "medium")  # libx264 preset: medium for speed/quality balance
             .run_async(pipe_stdin=True, pipe_stderr=True)
         )
 
