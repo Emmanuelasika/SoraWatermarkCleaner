@@ -30,7 +30,7 @@ This project provides an elegant way to remove the sora watermark in the sora2 g
 
 ## 1. Method
 
-The SoraWatermarkCleaner(we call it `SoraWm` later) is composed of two parsts:
+The SoraWatermarkCleaner(we call it `SoraWm` later) is composed of two parts:
 
 - SoraWaterMarkDetector: We trained a yolov11s version to detect the sora watermark. (Thank you yolo!)
 
@@ -63,23 +63,27 @@ uv sync
 The trained yolo weights will be stored in the `resources` dir as the `best.pt`.  And it will be automatically download from https://github.com/linkedlist771/SoraWatermarkCleaner/releases/download/V0.0.1/best.pt . The `Lama` model is downloaded from https://github.com/Sanster/models/releases/download/add_big_lama/big-lama.pt, and will be stored in the torch cache dir. Both downloads are automatic, if you fail, please check your internet status.
 
 3. Batch processing
-Use the cli.py for batch processing
 
-```
+Use the `cli.py` for batch processing
+
+```bash
 python cli.py [-h] -i INPUT -o OUTPUT [-p PATTERN] [--quiet]
 ```
 
 examples:
 
-```
+```bash
 # Process all .mp4 files in input folder
-python batch_process.py -i /path/to/input -o /path/to/output
+python cli.py -i /path/to/input -o /path/to/output
+
 # Process all .mov files
-python batch_process.py -i /path/to/input -o /path/to/output --pattern "*.mov"
+python cli.py -i /path/to/input -o /path/to/output --pattern "*.mov"
+
 # Process all video files (mp4, mov, avi)
-python batch_process.py -i /path/to/input -o /path/to/output --pattern "*.{mp4,mov,avi}"
-# Without displaying the Tqdm bar inside sorawm procrssing.
-python batch_process.py -i /path/to/input -o /path/to/output --quiet
+python cli.py -i /path/to/input -o /path/to/output --pattern "*.{mp4,mov,avi}"
+
+# Without displaying the Tqdm bar inside sorawm processing.
+python cli.py -i /path/to/input -o /path/to/output --quiet
 ```
 
 ## 3. One-Click Portable Version
@@ -89,6 +93,7 @@ For users who prefer a ready-to-use solution without manual installation, we pro
 ### Download Links
 
 **Google Drive:**
+
 - [Download from Google Drive](https://drive.google.com/file/d/1ujH28aHaCXGgB146g6kyfz3Qxd-wHR1c/view?usp=share_link)
 
 **Baidu Pan (百度网盘) - For users in China:**
@@ -96,14 +101,18 @@ For users who prefer a ready-to-use solution without manual installation, we pro
 - Extract Code (提取码): `jusu`
 
 ### Features
-- ✅ No installation required
-- ✅ All dependencies included
-- ✅ Pre-configured environment
-- ✅ Ready to use out of the box
+
+✅ No installation required
+
+✅ All dependencies included
+
+✅ Pre-configured environment
+
+✅ Ready to use out of the box
 
 Simply download, extract, and run!
 
-## 4.  Demo
+## 4. Demo
 
 To have a basic usage, just try the `example.py`:
 
@@ -171,15 +180,15 @@ You can use the **download URL** from step 2 to retrieve the cleaned video.
 
 ## 6. Datasets
 
-We have uploaded the labelled datasets into huggingface, check this out https://huggingface.co/datasets/LLinked/sora-watermark-dataset. Free free to train your custom detector model or improve our model!
+We have uploaded the labelled datasets into huggingface, check this [dataset](https://huggingface.co/datasets/LLinked/sora-watermark-dataset) out. Free free to train your custom detector model or improve our model!
 
 ## 7. API
 
-Packaged as a Cog and [published to Replicate](https://replicate.com/uglyrobot/sora2-watermark-remover) for simple API based usage.
+Packaged as a Cog and published to Replicate for simple API based usage.
 
 ## 8. License
 
- Apache License
+Apache License
 
 
 ## 9. Citation
