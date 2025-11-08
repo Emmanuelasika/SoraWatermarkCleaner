@@ -235,5 +235,11 @@ test_*.py
 test_*.ps1
 test_*.sh
 
+# Files with API keys
+QUICK_TEST.md
+RUNPOD_TESTING.md
+check_task_status.py
+check_task_error.py
+
 # Video files
 *.mp4
