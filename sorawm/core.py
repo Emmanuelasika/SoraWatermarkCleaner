@@ -3,6 +3,7 @@ from typing import Callable
 import threading
 import queue as queue_module
 import time
+import shutil
 
 import ffmpeg
 import numpy as np
@@ -68,34 +69,44 @@ class SoraWM:
         total_frames = input_video_loader.total_frames
 
         temp_output_path = output_video_path.parent / f"temp_{output_video_path.name}"
-        # Use "medium" preset instead of "slow" for better speed/quality balance
-        # "slow" can cause timeouts on longer videos
-        output_options = {
-            "pix_fmt": "yuv420p",
+        
+        # Build FFmpeg input stream
+        ffmpeg_input = ffmpeg.input(
+            "pipe:",
+            format="rawvideo",
+            pix_fmt="bgr24",
+            s=f"{width}x{height}",
+            r=fps,
+        )
+        
+        # Build output stream with safe, compatible options
+        # Use explicit parameters that work across all FFmpeg versions
+        output_kwargs = {
             "vcodec": "libx264",
+            "pix_fmt": "yuv420p",
+            "r": fps,  # Match input framerate
         }
-
+        
+        # Set quality/bitrate - use CRF for quality (lower = better quality)
+        # CRF 20 is a good balance (default is 23, 20 gives better quality)
         if input_video_loader.original_bitrate:
-            output_options["video_bitrate"] = str(
-                int(int(input_video_loader.original_bitrate) * 1.2)
-            )
+            # Use bitrate if available from source
+            bitrate = int(int(input_video_loader.original_bitrate) * 1.2)
+            output_kwargs["video_bitrate"] = str(bitrate)
+            output_kwargs["bufsize"] = str(bitrate * 2)  # Buffer size
         else:
-            output_options["crf"] = "18"
-
-        # Start FFmpeg process with stderr capture for better error reporting
-        # Note: Removed preset option as it causes issues with some FFmpeg versions
-        # FFmpeg will use default libx264 settings which provide good quality/speed balance
+            # Use CRF for quality-based encoding (no preset needed)
+            output_kwargs["crf"] = "20"  # Quality setting (18-28 range, lower = better)
+        
+        # Create output stream
+        ffmpeg_output = ffmpeg.output(ffmpeg_input, str(temp_output_path), **output_kwargs)
+        
+        # Start FFmpeg process with proper error handling
+        # No preset option - using default libx264 settings which are reliable
         process_out = (
-            ffmpeg.input(
-                "pipe:",
-                format="rawvideo",
-                pix_fmt="bgr24",
-                s=f"{width}x{height}",
-                r=fps,
-            )
-            .output(str(temp_output_path), **output_options)
+            ffmpeg_output
             .overwrite_output()
-            .global_args("-loglevel", "warning")  # Changed from "error" to "warning" to see more info
+            .global_args("-loglevel", "warning")
             .run_async(pipe_stdin=True, pipe_stderr=True)
         )
 
@@ -326,23 +337,50 @@ class SoraWM:
         self, input_video_path: Path, temp_output_path: Path, output_video_path: Path
     ):
         logger.info("Merging audio track...")
-        video_stream = ffmpeg.input(str(temp_output_path))
-        audio_stream = ffmpeg.input(str(input_video_path)).audio
+        try:
+            # Check if input video has audio
+            probe = ffmpeg.probe(str(input_video_path))
+            has_audio = any(stream.get('codec_type') == 'audio' for stream in probe.get('streams', []))
+            
+            if has_audio:
+                video_stream = ffmpeg.input(str(temp_output_path))
+                audio_stream = ffmpeg.input(str(input_video_path)).audio
 
-        (
-            ffmpeg.output(
-                video_stream,
-                audio_stream,
-                str(output_video_path),
-                vcodec="copy",
-                acodec="aac",
-            )
-            .overwrite_output()
-            .run(quiet=True)
-        )
-        # Clean up temporary file
-        temp_output_path.unlink()
-        logger.info(f"Saved no watermark video with audio at: {output_video_path}")
+                (
+                    ffmpeg.output(
+                        video_stream,
+                        audio_stream,
+                        str(output_video_path),
+                        vcodec="copy",  # Copy video codec (no re-encoding)
+                        acodec="aac",   # Encode audio to AAC
+                        strict="experimental",  # Allow experimental codecs if needed
+                    )
+                    .overwrite_output()
+                    .global_args("-loglevel", "warning")
+                    .run(quiet=False, capture_stdout=True, capture_stderr=True)
+                )
+            else:
+                # No audio track, just copy video to output
+                logger.info("No audio track found, copying video only...")
+                shutil.copy2(str(temp_output_path), str(output_video_path))
+            
+            # Clean up temporary file
+            if temp_output_path.exists():
+                temp_output_path.unlink()
+            logger.info(f"Saved no watermark video at: {output_video_path}")
+        except Exception as e:
+            logger.error(f"Error merging audio: {e}")
+            # If audio merge fails, at least save the video without audio
+            if temp_output_path.exists():
+                try:
+                    shutil.copy2(str(temp_output_path), str(output_video_path))
+                    logger.warning(f"Saved video without audio due to merge error: {output_video_path}")
+                    temp_output_path.unlink()
+                except Exception as copy_error:
+                    logger.error(f"Failed to copy video file: {copy_error}")
+                    raise RuntimeError(f"Failed to merge audio and save video: {e}") from e
+            else:
+                raise RuntimeError(f"Failed to merge audio: {e}") from e
 
 
 if __name__ == "__main__":
