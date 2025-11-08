@@ -26,30 +26,16 @@ ENV TORCH_HOME=/models \
     XDG_CACHE_HOME=/models/.cache
 RUN mkdir -p /models /models/hf /models/.cache
 
-# Add a tiny wrapper that imports the repo's FastAPI app and adds /ping for LB health checks.
-# (RunPod LB expects GET /ping on PORT_HEALTH.) 
-RUN printf '%s\n' \
-'from fastapi import FastAPI' \
-'try:' \
-'    from start_server import app as real_app' \
-'except Exception as e:' \
-'    real_app = FastAPI()' \
-'    @real_app.get("/")' \
-'    def _root(): return {"error":"failed to import app","detail":str(e)}' \
-'' \
-'app = real_app' \
-'' \
-'@app.get("/ping")' \
-'def ping():' \
-'    return {"status":"healthy"}' \
-> /app/_serve.py
-
 # Expose the repo's port
 EXPOSE 5344
 
 # Helpful defaults for RunPod Load Balancer
+# RunPod will set PORT and PORT_HEALTH environment variables
+# We serve the main API and health checks on the same port (PORT)
 ENV PORT=5344
 ENV PORT_HEALTH=5344
+ENV HOST=0.0.0.0
 
-# Start the server (use -u for unbuffered logs)
-CMD ["python", "-u", "-m", "uvicorn", "_serve:app", "--host", "0.0.0.0", "--port", "5344"]
+# Start the server using the _serve.py entry point
+# The _serve.py file is included in the repo and properly initializes the app
+CMD ["python", "-u", "_serve.py"]
