@@ -1,5 +1,8 @@
 from pathlib import Path
 from typing import Callable
+import threading
+import queue as queue_module
+import time
 
 import ffmpeg
 import numpy as np
@@ -170,14 +173,41 @@ class SoraWM:
         input_video_loader = VideoLoader(input_video_path)
 
         try:
+            # Read stderr in background to prevent blocking
+            stderr_lines = []
+            stderr_queue = queue_module.Queue()
+            
+            def read_stderr():
+                """Read FFmpeg stderr in background thread"""
+                try:
+                    if process_out.stderr:
+                        for line in iter(process_out.stderr.readline, b''):
+                            if line:
+                                stderr_lines.append(line.decode('utf-8', errors='ignore'))
+                                stderr_queue.put(line.decode('utf-8', errors='ignore'))
+                except Exception as e:
+                    logger.warning(f"Error reading FFmpeg stderr: {e}")
+            
+            stderr_thread = threading.Thread(target=read_stderr, daemon=True)
+            stderr_thread.start()
+            
             for idx, frame in enumerate(tqdm(input_video_loader, total=total_frames, desc="Remove watermarks", disable=quiet)):
-                # Check if FFmpeg process is still alive
+                # Check if FFmpeg process is still alive (non-blocking check)
                 if process_out.poll() is not None:
-                    # Process has terminated
+                    # Process has terminated unexpectedly
                     return_code = process_out.returncode
-                    stderr_output = process_out.stderr.read().decode('utf-8', errors='ignore') if process_out.stderr else ""
+                    # Collect stderr output
+                    stderr_output = '\n'.join(stderr_lines)
+                    if not stderr_output:
+                        # Try to get any remaining stderr
+                        try:
+                            remaining = process_out.stderr.read().decode('utf-8', errors='ignore') if process_out.stderr else ""
+                            if remaining:
+                                stderr_output = remaining
+                        except:
+                            pass
                     raise RuntimeError(
-                        f"FFmpeg process terminated unexpectedly with return code {return_code}. "
+                        f"FFmpeg process terminated unexpectedly at frame {idx}/{total_frames} with return code {return_code}. "
                         f"Error: {stderr_output}"
                     )
                 
@@ -196,11 +226,28 @@ class SoraWM:
                     process_out.stdin.flush()  # Flush to ensure data is written
                 except BrokenPipeError as e:
                     # FFmpeg process closed the pipe (crashed or closed)
-                    stderr_output = process_out.stderr.read().decode('utf-8', errors='ignore') if process_out.stderr else ""
+                    stderr_output = '\n'.join(stderr_lines)
+                    if not stderr_output:
+                        try:
+                            remaining = process_out.stderr.read().decode('utf-8', errors='ignore') if process_out.stderr else ""
+                            if remaining:
+                                stderr_output = remaining
+                        except:
+                            pass
                     raise RuntimeError(
                         f"FFmpeg pipe broken at frame {idx}/{total_frames}. "
                         f"This usually means FFmpeg crashed. Error: {stderr_output}"
                     ) from e
+                except OSError as e:
+                    # Handle other OS-level errors (like process terminated)
+                    if process_out.poll() is not None:
+                        return_code = process_out.returncode
+                        stderr_output = '\n'.join(stderr_lines)
+                        raise RuntimeError(
+                            f"FFmpeg process terminated at frame {idx}/{total_frames} with return code {return_code}. "
+                            f"Error: {stderr_output}"
+                        ) from e
+                    raise RuntimeError(f"Error writing frame {idx} to FFmpeg: {e}") from e
                 except Exception as e:
                     raise RuntimeError(f"Error writing frame {idx} to FFmpeg: {e}") from e
 
@@ -211,10 +258,40 @@ class SoraWM:
 
             # Close stdin and wait for FFmpeg to finish
             process_out.stdin.close()
-            return_code = process_out.wait()
+            
+            # Wait for process to finish (poll with timeout to detect hangs)
+            timeout_seconds = 300  # 5 minute timeout for final encoding
+            start_time = time.time()
+            return_code = None
+            
+            while return_code is None:
+                return_code = process_out.poll()
+                if return_code is not None:
+                    break
+                if time.time() - start_time > timeout_seconds:
+                    logger.error(f"FFmpeg process did not finish within {timeout_seconds} seconds, killing...")
+                    process_out.kill()
+                    return_code = process_out.wait()
+                    break
+                time.sleep(0.1)  # Check every 100ms
+            
+            if return_code is None:
+                return_code = process_out.wait()
+            
+            # Wait a bit for stderr thread to finish reading
+            stderr_thread.join(timeout=2)
+            
+            # Collect final stderr output
+            stderr_output = '\n'.join(stderr_lines)
+            if not stderr_output and process_out.stderr:
+                try:
+                    remaining = process_out.stderr.read().decode('utf-8', errors='ignore')
+                    if remaining:
+                        stderr_output = remaining
+                except:
+                    pass
             
             if return_code != 0:
-                stderr_output = process_out.stderr.read().decode('utf-8', errors='ignore') if process_out.stderr else ""
                 raise RuntimeError(
                     f"FFmpeg encoding failed with return code {return_code}. "
                     f"Error: {stderr_output}"
