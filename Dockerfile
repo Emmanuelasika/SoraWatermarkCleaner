@@ -1,9 +1,22 @@
 # CUDA + PyTorch runtime
 FROM pytorch/pytorch:2.3.1-cuda12.1-cudnn8-runtime
 
-# System deps (FFmpeg is required by the repo)
-RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg git && \
-    rm -rf /var/lib/apt/lists/*
+# System deps (FFmpeg with libx264 codec support is required by the repo)
+# Install FFmpeg static build with all codecs including libx264
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    wget \
+    xz-utils \
+    git \
+    && rm -rf /var/lib/apt/lists/* \
+    && cd /tmp \
+    && wget -q https://johnvansickle.com/ffmpeg/builds/ffmpeg-git-amd64-static.tar.xz \
+    && tar -xf ffmpeg-git-amd64-static.tar.xz \
+    && mv ffmpeg-*-amd64-static/ffmpeg /usr/local/bin/ \
+    && mv ffmpeg-*-amd64-static/ffprobe /usr/local/bin/ \
+    && chmod +x /usr/local/bin/ffmpeg /usr/local/bin/ffprobe \
+    && rm -rf ffmpeg-*-amd64-static* ffmpeg-git-amd64-static.tar.xz \
+    && ffmpeg -version \
+    && ffmpeg -codecs 2>&1 | grep -q "libx264" || echo "WARNING: libx264 not found"
 
 # Install uv
 RUN pip install -U pip uv
