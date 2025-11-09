@@ -2,21 +2,23 @@
 FROM pytorch/pytorch:2.3.1-cuda12.1-cudnn8-runtime
 
 # System deps (FFmpeg with libx264 codec support is required by the repo)
-# Install FFmpeg static build with all codecs including libx264
+# Download static FFmpeg build with full codec support including libx264
 RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     xz-utils \
     git \
     && rm -rf /var/lib/apt/lists/* \
     && cd /tmp \
-    && wget -q https://johnvansickle.com/ffmpeg/builds/ffmpeg-git-amd64-static.tar.xz \
-    && tar -xf ffmpeg-git-amd64-static.tar.xz \
-    && mv ffmpeg-*-amd64-static/ffmpeg /usr/local/bin/ \
-    && mv ffmpeg-*-amd64-static/ffprobe /usr/local/bin/ \
+    && wget -q --no-check-certificate https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz \
+    && tar -xf ffmpeg-release-amd64-static.tar.xz \
+    && FFMPEG_DIR=$(find . -maxdepth 1 -type d -name "ffmpeg-*-amd64-static" | head -1) \
+    && mv ${FFMPEG_DIR}/ffmpeg /usr/local/bin/ \
+    && mv ${FFMPEG_DIR}/ffprobe /usr/local/bin/ \
     && chmod +x /usr/local/bin/ffmpeg /usr/local/bin/ffprobe \
-    && rm -rf ffmpeg-*-amd64-static* ffmpeg-git-amd64-static.tar.xz \
+    && rm -rf ${FFMPEG_DIR} ffmpeg-release-amd64-static.tar.xz \
     && ffmpeg -version \
-    && ffmpeg -codecs 2>&1 | grep -q "libx264" || echo "WARNING: libx264 not found"
+    && echo "Checking for libx264 codec..." \
+    && ffmpeg -codecs 2>&1 | grep -q "libx264" && echo "✓ libx264 codec is available" || echo "✗ libx264 codec NOT found"
 
 # Install uv
 RUN pip install -U pip uv
